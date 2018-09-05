@@ -1,4 +1,5 @@
 class ItemsController < ApplicationController
+  before_action :set_item, :only => [:show, :edit, :update, :destroy]
   def index
     @items = Item.all
   end
@@ -9,34 +10,33 @@ class ItemsController < ApplicationController
 
   def create
     @item = Item.new(item_params)
-    @item.save
-
-    redirect_to items_url
-  end
-
-  def show
-    @item = Item.find(params[:id])
-  end
-
-  def edit
-    @item = Item.find(params[:id])
+    if @item.save
+      redirect_to items_url
+    else
+      render :action => :new
+    end
   end
 
   def update
-    @item = Item.find(params[:id])
-    @item.update_attributes(item_params)
-
-    redirect_to item_path(@item)
+    if @item.update_attributes(item_params)
+      redirect_to item_path(@item)
+    else
+      render :edit
+    end
   end
 
   def destroy
-    @item = Item.find(params[:id])
+    
     @item.destroy
 
     redirect_to items_url
   end
 
   private
+
+  def set_item
+    @item = Item.find(params[:id])
+  end
 
   def item_params
     params.require(:item).permit(:title, :date, :description)
